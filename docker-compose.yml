@@ -1,0 +1,120 @@
+version: '3.8'
+services:
+    arches_db:
+      container_name: postgres14-3_arches_her
+      image: postgis/postgis:14-3.2
+      volumes:
+          - postgres-data-arches-her:/var/lib/postgresql/data
+          - postgres-log-arches-her:/var/log/postgresql
+          - ./init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
+      ports:
+        - '${PG_14_HOST_PORT:-5433}:5432'
+      environment:
+        - POSTGRES_USER=${POSTGRES_USER}
+        - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+        - POSTGRES_DB=postgres
+        - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
+        - TZ=UTC
+      networks:
+        - arches-network
+      env_file:
+        - ./.env
+      restart: always
+
+    arches_couchdb:
+      container_name: couchdb2-1_arches_her
+      image: couchdb:2.1.1
+      ports:
+        - "5985:5984"
+      volumes:
+        - couchdb-data-arches-her:/usr/local/var/lib/couchdb
+        - couchdb-log-arches-her:/usr/local/var/log/couchdb
+      environment:
+        - COUCHDB_USER=${COUCHDB_USER}
+        - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+      networks:
+        - arches-network
+      env_file:
+        - ./.env
+      restart: always
+
+    arches_elasticsearch:
+      container_name: elasticsearch7-17_arches_her
+      image: ${ES_BASE_IMAGE:-elasticsearch:7.17.13}
+      volumes:
+        - elasticsearch-data-arches-her:/usr/share/elasticsearch/data
+      ports:
+        - "${ES_7_HOST_PORT:-9201}:9200"
+        - "9301:9300"
+      environment:
+        - TZ=UTC
+        - discovery.type=single-node
+        - discovery.seed_hosts=
+        - "ES_JAVA_OPTS=-Xms400m -Xmx400m"
+      networks:
+        - arches-network
+      restart: always
+
+    arches_rabbitmq:
+      container_name: rabbitmq3_arches_her
+      image: rabbitmq:3-management
+      hostname: my-rabbit
+      volumes:
+        - rabbitmq-data-arches-her:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+        - rabbitmq-logs-arches-her:/var/log/rabbitmq/log
+      ports:
+        - 5673:5672
+        - 15673:15672
+      networks:
+        - arches-network
+      restart: always
+
+#  varnish:
+#    image: eeacms/varnish
+#    # ports:
+#    #   - '6081:6081'
+#    #   - '80:80'
+#    environment:
+#      BACKENDS: 'tileserv:7800'
+#      DNS_ENABLED: 'false'
+#      COOKIES: 'true'
+#      PARAM_VALUE: '-p default_ttl=600'
+#    # networks:
+#    #   - webapp
+#    network_mode: host
+#    depends_on:
+#      - tileserv
+#    restart: always
+
+#  tileserv:
+#    image: pramsey/pg_tileserv:latest
+#    ports:
+#      - '7800:7800'
+#    network_mode: host
+#    environment:
+#      - DATABASE_URL=postgresql://postgres@localhost/dev_project
+#    restart: always
+
+    arches_memcached:
+      container_name: memcached_arches_her
+      image: memcached:1.6.22
+      ports:
+        - 11211:11211
+      networks:
+        - arches-network
+      restart: always
+
+networks:
+  arches-network:
+    name: arches-network
+    driver: bridge
+
+volumes:
+    couchdb-data-arches-her:
+    couchdb-log-arches-her:
+    postgres-data-arches-her:
+    postgres-log-arches-her:
+    elasticsearch-data-arches-her:
+    elasticsearch-upgrade-data-arches-her:
+    rabbitmq-logs-arches-her:
+    rabbitmq-data-arches-her:
