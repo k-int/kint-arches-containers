@@ -38,7 +38,8 @@ services:
         - ./.env
       restart: always
 
-    arches_elasticsearch:
+    # Arches v6 uses ES7
+    arches_elasticsearch: 
       container_name: elasticsearch7-17_arches_her
       image: ${ES_BASE_IMAGE:-elasticsearch:7.17.13}
       volumes:
@@ -68,6 +69,27 @@ services:
       networks:
         - arches-network
       restart: always
+
+    arches_geoserver:
+      container_name: geoserver_arches_her
+      image: kartoza/geoserver:2.24.1
+      volumes:
+        - geoserver-data-arches-her:/opt/geoserver/data_dir
+      ports:
+        - 80:8080
+        #- 8081:8080
+      environment:
+        - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
+        - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
+        - CORS_ENABLED=true
+        - COMMUNITY_EXTENSIONS=cog-plugin,s3-geotiff-plugin
+        - SKIP_DEMO_DATA=true 
+      env_file:
+        - ./.env
+      networks:
+        - arches-network
+      restart: always
+
 
 #  varnish:
 #    image: eeacms/varnish
@@ -118,3 +140,4 @@ volumes:
     elasticsearch-upgrade-data-arches-her:
     rabbitmq-logs-arches-her:
     rabbitmq-data-arches-her:
+    geoserver-data-arches-her:
