@@ -73,7 +73,7 @@ services:
       restart: always
 
     arches_geoserver:
-      container_name: geoserver_arches
+      container_name: geoserver2-24_arches
       image: kartoza/geoserver:2.24.1
       volumes:
         - geoserver-data-arches:/opt/geoserver/data_dir
@@ -119,7 +119,7 @@ services:
 #    restart: always
 
     arches_memcached:
-      container_name: memcached_arches
+      container_name: memcached1-6_arches
       image: memcached:1.6.22
       ports:
         - 11211:11211
