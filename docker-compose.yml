@@ -1,11 +1,11 @@
 version: '3.8'
 services:
     arches_db:
-      container_name: postgres14-3_arches_her
+      container_name: postgres14-3_arches
       image: postgis/postgis:14-3.2
       volumes:
-          - postgres-data-arches-her:/var/lib/postgresql/data
-          - postgres-log-arches-her:/var/log/postgresql
+          - postgres-data-arches:/var/lib/postgresql/data
+          - postgres-log-arches:/var/log/postgresql
           - ./init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
       ports:
         - '${PG_14_HOST_PORT:-5433}:5432'
@@ -22,13 +22,13 @@ services:
       restart: always
 
     arches_couchdb:
-      container_name: couchdb2-1_arches_her
+      container_name: couchdb2-1_arches
       image: couchdb:2.1.1
       ports:
         - "5985:5984"
       volumes:
-        - couchdb-data-arches-her:/usr/local/var/lib/couchdb
-        - couchdb-log-arches-her:/usr/local/var/log/couchdb
+        - couchdb-data-arches:/usr/local/var/lib/couchdb
+        - couchdb-log-arches:/usr/local/var/log/couchdb
       environment:
         - COUCHDB_USER=${COUCHDB_USER}
         - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
@@ -39,11 +39,12 @@ services:
       restart: always
 
     # Arches v6 uses ES7
+    # TODO: Change to ES8 for ArchesV7
     arches_elasticsearch:
-      container_name: elasticsearch7-17_arches_her
+      container_name: elasticsearch7-17_arches
       image: ${ES_BASE_IMAGE:-elasticsearch:7.17.13}
       volumes:
-        - elasticsearch-data-arches-her:/usr/share/elasticsearch/data
+        - elasticsearch-data-arches:/usr/share/elasticsearch/data
       ports:
         - "${ES_7_HOST_PORT:-9201}:9200"
         - "9301:9300"
@@ -58,12 +59,12 @@ services:
       restart: always
 
     arches_rabbitmq:
-      container_name: rabbitmq3_arches_her
+      container_name: rabbitmq3_arches
       image: rabbitmq:3-management
       hostname: my-rabbit
       volumes:
-        - rabbitmq-data-arches-her:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
-        - rabbitmq-logs-arches-her:/var/log/rabbitmq/log
+        - rabbitmq-data-arches:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
+        - rabbitmq-logs-arches:/var/log/rabbitmq/log
       ports:
         - 5673:5672
         - 15673:15672
@@ -72,10 +73,10 @@ services:
       restart: always
 
     arches_geoserver:
-      container_name: geoserver_arches_her
+      container_name: geoserver_arches
       image: kartoza/geoserver:2.24.1
       volumes:
-        - geoserver-data-arches-her:/opt/geoserver/data_dir
+        - geoserver-data-arches:/opt/geoserver/data_dir
       ports:
         - 8080:8080
       environment:
@@ -118,7 +119,7 @@ services:
 #    restart: always
 
     arches_memcached:
-      container_name: memcached_arches_her
+      container_name: memcached_arches
       image: memcached:1.6.22
       ports:
         - 11211:11211
@@ -132,12 +133,12 @@ networks:
     driver: bridge
 
 volumes:
-    couchdb-data-arches-her:
-    couchdb-log-arches-her:
-    postgres-data-arches-her:
-    postgres-log-arches-her:
-    elasticsearch-data-arches-her:
-    elasticsearch-upgrade-data-arches-her:
-    rabbitmq-logs-arches-her:
-    rabbitmq-data-arches-her:
-    geoserver-data-arches-her:
+    couchdb-data-arches:
+    couchdb-log-arches:
+    postgres-data-arches:
+    postgres-log-arches:
+    elasticsearch-data-arches:
+    elasticsearch-upgrade-data-arches:
+    rabbitmq-logs-arches:
+    rabbitmq-data-arches:
+    geoserver-data-arches:
