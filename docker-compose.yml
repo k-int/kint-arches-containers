@@ -51,9 +51,10 @@ services:
       environment:
         - TZ=UTC
         - discovery.type=single-node
-        - discovery.seed_hosts=
-        #- "ES_JAVA_OPTS=-Xms400m -Xmx400m"
         - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+        - ELASTIC_USER=$ELASTIC_USER
+        - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+        - xpack.security.enabled=$ELASTIC_SECURITY        
       networks:
         - arches-network
       restart: always
