@@ -8,7 +8,7 @@ services:
           - postgres-log-arches:/var/log/postgresql
           - ./init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
       ports:
-        - '${PG_14_HOST_PORT:-5433}:5432'
+        - "127.0.0.1:5433:5432"
       environment:
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -25,7 +25,7 @@ services:
       container_name: couchdb2-1_arches
       image: couchdb:2.1.1
       ports:
-        - "5985:5984"
+        - "127.0.0.1:5985:5984"
       volumes:
         - couchdb-data-arches:/usr/local/var/lib/couchdb
         - couchdb-log-arches:/usr/local/var/log/couchdb
@@ -46,8 +46,8 @@ services:
       volumes:
         - elasticsearch-data-arches:/usr/share/elasticsearch/data
       ports:
-        - "${ES_7_HOST_PORT:-9201}:9200"
-        - "9301:9300"
+        - "127.0.0.1:9201:9200"
+        - "127.0.0.1:9301:9300"
       environment:
         - TZ=UTC
         - discovery.type=single-node
@@ -67,8 +67,8 @@ services:
         - rabbitmq-data-arches:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
         - rabbitmq-logs-arches:/var/log/rabbitmq/log
       ports:
-        - 5673:5672
-        - 15673:15672
+        - 127.0.0.1:5673:5672
+        - 127.0.0.1:15673:15672
       networks:
         - arches-network
       restart: always
@@ -79,7 +79,7 @@ services:
       volumes:
         - geoserver-data-arches:/opt/geoserver/data_dir
       ports:
-        - 8080:8080
+        - 127.0.0.1:8080:8080
       environment:
         - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
         - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
@@ -123,7 +123,7 @@ services:
       container_name: memcached1-6_arches
       image: memcached:1.6.22
       ports:
-        - 11211:11211
+        - "127.0.0.1:11211:11211"
       networks:
         - arches-network
       restart: always
