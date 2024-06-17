@@ -15,6 +15,13 @@ services:
         - POSTGRES_DB=postgres
         - POSTGRES_MULTIPLE_EXTENSIONS=postgis,postgis_topology
         - TZ=UTC
+      command: |
+          postgres
+            -c max_connections=${MAX_CONNECTIONS}
+            -c shared_buffers=${SHARED_BUFFERS}
+            -c effective_cache_size=${EFFECTIVE_CACHE_SIZE}
+            -c work_mem=${WORK_MEM}
+            -c maintenance_work_mem=${MAINTENANCE_WORK_MEM}
       networks:
         - arches-network
       env_file:
@@ -51,7 +58,7 @@ services:
       environment:
         - TZ=UTC
         - discovery.type=single-node
-        - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
+        - "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
         - ELASTIC_USER=$ELASTIC_USER
         - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
         - xpack.security.enabled=$ELASTIC_SECURITY        

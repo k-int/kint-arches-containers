@@ -1,9 +1,22 @@
+# PostgreSQL config
 POSTGRES_USER=
 POSTGRES_PASSWORD=
+MAX_CONNECTIONS=100 # default 100
+SHARED_BUFFERS=128MB # default 128MB - should be tuned to 15-25% of RAM
+WORK_MEM=4MB # default 4MB - tuning: Total RAM * 0.25 / max_connections
+MAINTENANCE_WORK_MEM=64MB # default 64MB - tuning: Total RAM *0.05 - should be higher than work_mem
+EFFECTIVE_CACHE_SIZE=4GB # default 4GB - tune to 50% of total RAM
+
+# Elasticsearch config
 ELASTIC_USER= 
 ELASTIC_PASSWORD=
-ELASTIC_SECURITY= #lowercase true or false
+ELASTIC_JVM_OPTS= # e.g. 8g or 1024m
+ELASTIC_SECURITY= # lowercase true or false
+
+# CouchDB config
 COUCHDB_USER=
 COUCHDB_PASSWORD=
+
+# Geoserver config
 GEOSERVER_ADMIN_USER=
 GEOSERVER_ADMIN_PASSWORD=
