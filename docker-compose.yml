@@ -1,5 +1,5 @@
-version: '3.8'
 services:
+
     arches_db:
       container_name: postgres14-3_arches
       image: postgis/postgis:14-3.2
@@ -8,7 +8,7 @@ services:
           - postgres-log-arches:/var/log/postgresql
           - ./init-unix.sql:/docker-entrypoint-initdb.d/init.sql # to set up the DB template
       ports:
-        - "127.0.0.1:5433:5432"
+        - "${POSTGRES_PORT}:5432"
       environment:
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -22,43 +22,27 @@ services:
             -c effective_cache_size=${EFFECTIVE_CACHE_SIZE}
             -c work_mem=${WORK_MEM}
             -c maintenance_work_mem=${MAINTENANCE_WORK_MEM}
+#            -c log_statement=all
       networks:
         - arches-network
       env_file:
         - ./.env
       restart: always
 
-    arches_couchdb:
-      container_name: couchdb2-1_arches
-      image: couchdb:2.1.1
-      ports:
-        - "127.0.0.1:5985:5984"
-      volumes:
-        - couchdb-data-arches:/usr/local/var/lib/couchdb
-        - couchdb-log-arches:/usr/local/var/log/couchdb
-      environment:
-        - COUCHDB_USER=${COUCHDB_USER}
-        - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
-      networks:
-        - arches-network
-      env_file:
-        - ./.env
-      restart: always
 
-    # Arches v6 uses ES7
-    # TODO: Change to ES8 for ArchesV7
     arches_elasticsearch:
       container_name: elasticsearch7-17_arches
-      image: ${ES_BASE_IMAGE:-elasticsearch:7.17.13}
+      image: elasticsearch:8.5.3
       volumes:
         - elasticsearch-data-arches:/usr/share/elasticsearch/data
       ports:
-        - "127.0.0.1:9201:9200"
+        - "${ELASTIC_PORT}:9200"
         - "127.0.0.1:9301:9300"
       environment:
         - TZ=UTC
         - discovery.type=single-node
-        - "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
+        #- "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
+        - bootstrap.memory_lock=true
         - ELASTIC_USER=$ELASTIC_USER
         - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
         - xpack.security.enabled=$ELASTIC_SECURITY        
@@ -66,19 +50,21 @@ services:
         - arches-network
       restart: always
 
-    arches_rabbitmq:
-      container_name: rabbitmq3_arches
-      image: rabbitmq:3-management
-      hostname: my-rabbit
-      volumes:
-        - rabbitmq-data-arches:/var/lib/rabbitmq/mnesia/rabbit@my-rabbit
-        - rabbitmq-logs-arches:/var/log/rabbitmq/log
+
+    arches_redis:
+      container_name: redis_arches
+      image: "redis:latest"
       ports:
-        - 127.0.0.1:5673:5672
-        - 127.0.0.1:15673:15672
+        - "${REDIS_PORT}:6379"
+      volumes:
+        - redis-data-arches:/data
+      command: >
+        --requirepass ${REDIS_PASSWORD}
+        --loglevel debug
       networks:
         - arches-network
       restart: always
+
 
     arches_geoserver:
       container_name: geoserver2-24_arches
@@ -117,6 +103,7 @@ services:
 #      - tileserv
 #    restart: always
 
+
 #  tileserv:
 #    image: pramsey/pg_tileserv:latest
 #    ports:
@@ -126,14 +113,17 @@ services:
 #      - DATABASE_URL=postgresql://postgres@localhost/dev_project
 #    restart: always
 
-    arches_memcached:
-      container_name: memcached1-6_arches
-      image: memcached:1.6.22
-      ports:
-        - "127.0.0.1:11211:11211"
-      networks:
-        - arches-network
-      restart: always
+
+  # Commented out to favour use of Redis cache + message broker 
+    # arches_memcached:
+    #   container_name: memcached1-6_arches
+    #   image: memcached:1.6.22
+    #   ports:
+    #     - "127.0.0.1:11211:11211"
+    #   networks:
+    #     - arches-network
+    #   restart: always
+
 
 networks:
   arches-network:
@@ -150,3 +140,4 @@ volumes:
     rabbitmq-logs-arches:
     rabbitmq-data-arches:
     geoserver-data-arches:
+    redis-data-arches:
