@@ -16,6 +16,9 @@ Future containers to be added:
 - Celery workers / supervisor
 - Flower (UI for celery)
 
+Previously removed:
+- CouchDB (removed in 7.0.0)
+
 ## Configuration
 
 ### Getting started
