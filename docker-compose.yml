@@ -150,6 +150,31 @@ services:
 #    restart: always
 
 
+    pg-featureserv:
+      container_name: pg-featureserv_arches
+      image: pramsey/pg_featureserv
+      volumes:
+        - $SSL_CERTIFICATE_FILE:/etc/ssl/certificate-file.crt
+        - $SSL_PRIVATE_KEY_FILE:/etc/ssl/private-key.key
+      environment:
+        - DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@arches_db:5432/arches_her
+        - PGFS_HTTPHOST=localhost
+        - PGFS_SERVER_HTTPPORT=9001  # HTTP port
+        - PGFS_SERVER_HTTPSPORT=9002 # HTTPS port
+        - PGFS_SERVER_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
+        - PGFS_SERVER_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
+      env_file:
+        - ./.env
+      ports:
+        - 127.0.0.1:9001:9001
+        - 127.0.0.1:9002:9002
+      depends_on:
+        - arches_db
+      networks:
+        - arches-network
+      restart: always
+
+
   # Commented out to favour use of Redis cache + message broker 
     # arches_memcached:
     #   container_name: memcached1-6_arches
