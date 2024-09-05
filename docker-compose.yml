@@ -140,14 +140,56 @@ services:
 #    restart: always
 
 
-#  tileserv:
-#    image: pramsey/pg_tileserv:latest
-#    ports:
-#      - '7800:7800'
-#    network_mode: host
-#    environment:
-#      - DATABASE_URL=postgresql://postgres@localhost/dev_project
-#    restart: always
+    pg_tileserv:
+      container_name: pg_tileserv_arches
+      image: pramsey/pg_tileserv:latest
+      # volumes:
+      #   - ${SSL_CERTIFICATE_FILE:-/dev/null}:/etc/ssl/certificate-file.crt
+      #   - ${SSL_PRIVATE_KEY_FILE:-/dev/null}:/etc/ssl/private-key.key
+      environment:
+        - DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@arches_db:5432/arches_her
+        # - TS_HTTPHOST=localhost # this line seems to break access
+        - TS_HTTPPORT=7800
+        - TS_HTTPSPORT=7801
+        - TS_BASEPATH=/pgtileserv
+        # - TS_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
+        # - TS_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
+      env_file:
+        - ./.env
+      ports:
+        - 127.0.0.1:7800:7800
+        - 127.0.0.1:7801:7801
+      depends_on:
+        - arches_db
+      networks:
+        - arches-network
+      restart: always
+
+
+    pg_featureserv:
+      container_name: pg_featureserv_arches
+      image: pramsey/pg_featureserv
+      # volumes:
+      #   - ${SSL_CERTIFICATE_FILE:-/dev/null}:/etc/ssl/certificate-file.crt
+      #   - ${SSL_PRIVATE_KEY_FILE:-/dev/null}:/etc/ssl/private-key.key
+      environment:
+        - DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@arches_db:5432/arches_her
+        - PGFS_HTTPHOST=localhost
+        - PGFS_SERVER_HTTPPORT=9001  # HTTP port
+        - PGFS_SERVER_HTTPSPORT=9002 # HTTPS port
+        - PGFS_SERVER_BASEPATH=/pgfeatureserv
+        # - PGFS_SERVER_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
+        # - PGFS_SERVER_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
+      env_file:
+        - ./.env
+      ports:
+        - 127.0.0.1:9001:9001
+        - 127.0.0.1:9002:9002
+      depends_on:
+        - arches_db
+      networks:
+        - arches-network
+      restart: always
 
 
   # Commented out to favour use of Redis cache + message broker 
