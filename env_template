@@ -13,7 +13,7 @@ ELASTIC_USER=
 ELASTIC_PASSWORD=
 ELASTIC_PORT=127.0.0.1:9201 # e.g. 9201 or 127.0.0.1:9201 for localhost
 ELASTIC_JVM_OPTS= # e.g. 8g or 1024m
-ELASTIC_SECURITY= # lowercase true or false
+ELASTIC_SECURITY= # lowercase true or false NOTE: now enforced in either dev or prod compose file
 ELASTIC_MEM_LIMIT= # e.g. 8g or 1024m
 
 # Geoserver config

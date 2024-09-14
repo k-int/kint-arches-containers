@@ -34,6 +34,8 @@ services:
       container_name: elasticsearch_arches_01
       image: elasticsearch:8.5.3
       volumes:
+        - $SSL_CERTIFICATE_FILE:/usr/share/elasticsearch/config/ssl/certificate-file.crt
+        - $SSL_PRIVATE_KEY_FILE:/usr/share/elasticsearch/config/ssl/private-key.key
         - elasticsearch-data-arches-01:/usr/share/elasticsearch/data
       ports:
         - "${ELASTIC_PORT}:9200"
@@ -44,13 +46,18 @@ services:
         - cluster.name=kint_arches_contaniners_elasticsearch
         - cluster.initial_master_nodes=arches_elasticsearch_01,arches_elasticsearch_02
         - discovery.seed_hosts=arches_elasticsearch_02
-        # - discovery.type=single-node
         #- "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
         - bootstrap.memory_lock=true
         - ELASTIC_USER=$ELASTIC_USER
         - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
-        - xpack.security.enabled=$ELASTIC_SECURITY
-        - xpack.security.transport.ssl.enabled=$ELASTIC_SECURITY
+        - xpack.security.enabled=true
+        - xpack.security.transport.ssl.enabled=true
+        - xpack.security.http.ssl.enabled=true
+        - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/ssl/private-key.key
+        - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/ssl/certificate-file.crt
+        - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/ssl/private-key.key
+        - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/ssl/certificate-file.crt
+        - xpack.security.transport.ssl.verification_mode=certificate
       mem_limit: $ELASTIC_MEM_LIMIT
       ulimits:
         memlock:
@@ -58,6 +65,8 @@ services:
           hard: -1
       networks:
         - arches-network
+      # depends_on:
+      #   - ssl_container
       restart: always
 
 
@@ -65,6 +74,8 @@ services:
       container_name: elasticsearch_arches_02
       image: elasticsearch:8.5.3
       volumes:
+        - $SSL_CERTIFICATE_FILE:/usr/share/elasticsearch/config/ssl/certificate-file.crt
+        - $SSL_PRIVATE_KEY_FILE:/usr/share/elasticsearch/config/ssl/private-key.key
         - elasticsearch-data-arches-02:/usr/share/elasticsearch/data
       environment:
         - TZ=UTC
@@ -72,11 +83,18 @@ services:
         - cluster.name=kint_arches_contaniners_elasticsearch
         - cluster.initial_master_nodes=arches_elasticsearch_01,arches_elasticsearch_02
         - discovery.seed_hosts=arches_elasticsearch_01
-        # - discovery.type=single-node
         #- "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
         - bootstrap.memory_lock=true
-        - xpack.security.enabled=$ELASTIC_SECURITY 
-        - xpack.security.transport.ssl.enabled=$ELASTIC_SECURITY 
+        - ELASTIC_USER=$ELASTIC_USER
+        - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
+        - xpack.security.enabled=true
+        - xpack.security.transport.ssl.enabled=true
+        - xpack.security.http.ssl.enabled=true
+        - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/ssl/private-key.key
+        - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/ssl/certificate-file.crt
+        - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/ssl/private-key.key
+        - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/ssl/certificate-file.crt
+        - xpack.security.transport.ssl.verification_mode=certificate
       mem_limit: $ELASTIC_MEM_LIMIT
       ulimits:
         memlock:
@@ -143,17 +161,17 @@ services:
     pg_tileserv:
       container_name: pg_tileserv_arches
       image: pramsey/pg_tileserv:latest
-      # volumes:
-      #   - ${SSL_CERTIFICATE_FILE:-/dev/null}:/etc/ssl/certificate-file.crt
-      #   - ${SSL_PRIVATE_KEY_FILE:-/dev/null}:/etc/ssl/private-key.key
+      volumes:
+        - $SSL_CERTIFICATE_FILE:/etc/ssl/certificate-file.crt
+        - $SSL_PRIVATE_KEY_FILE:/etc/ssl/private-key.key
       environment:
         - DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@arches_db:5432/arches_her
         # - TS_HTTPHOST=localhost # this line seems to break access
         - TS_HTTPPORT=7800
         - TS_HTTPSPORT=7801
         - TS_BASEPATH=/pgtileserv
-        # - TS_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
-        # - TS_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
+        - TS_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
+        - TS_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
       env_file:
         - ./.env
       ports:
@@ -169,17 +187,17 @@ services:
     pg_featureserv:
       container_name: pg_featureserv_arches
       image: pramsey/pg_featureserv
-      # volumes:
-      #   - ${SSL_CERTIFICATE_FILE:-/dev/null}:/etc/ssl/certificate-file.crt
-      #   - ${SSL_PRIVATE_KEY_FILE:-/dev/null}:/etc/ssl/private-key.key
+      volumes:
+        - $SSL_CERTIFICATE_FILE:/etc/ssl/certificate-file.crt
+        - $SSL_PRIVATE_KEY_FILE:/etc/ssl/private-key.key
       environment:
         - DATABASE_URL=postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@arches_db:5432/arches_her
         - PGFS_HTTPHOST=localhost
         - PGFS_SERVER_HTTPPORT=9001  # HTTP port
         - PGFS_SERVER_HTTPSPORT=9002 # HTTPS port
         - PGFS_SERVER_BASEPATH=/pgfeatureserv
-        # - PGFS_SERVER_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
-        # - PGFS_SERVER_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
+        - PGFS_SERVER_TLSSERVERCERTIFICATEFILE=/etc/ssl/certificate-file.crt
+        - PGFS_SERVER_TLSSERVERPRIVATEKEYFILE=/etc/ssl/private-key.key
       env_file:
         - ./.env
       ports:
