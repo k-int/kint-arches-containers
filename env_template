@@ -13,7 +13,7 @@ ELASTIC_USER=
 ELASTIC_PASSWORD=
 ELASTIC_PORT=127.0.0.1:9201 # e.g. 9201 or 127.0.0.1:9201 for localhost
 ELASTIC_JVM_OPTS= # e.g. 8g or 1024m
-ELASTIC_SECURITY= # lowercase true or false
+ELASTIC_SECURITY= # lowercase true or false NOTE: now enforced in either dev or prod compose file
 ELASTIC_MEM_LIMIT= # e.g. 8g or 1024m
 
 # Geoserver config
@@ -25,6 +25,9 @@ REDIS_PORT= #e.g. 6379 or 127.0.0.1:6379 for localhost
 REDIS_USERNAME= 
 REDIS_PASSWORD=
 
+
+### PROD ONLY CONFIG
 # Server SSL certificates
 SSL_CERTIFICATE_FILE= # provide key to certificate
 SSL_PRIVATE_KEY_FILE= # provide path to private key
+DOMAIN_NAME= # domain e.g. mysite.org.uk or localhost for local dev
