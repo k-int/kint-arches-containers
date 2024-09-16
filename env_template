@@ -25,6 +25,9 @@ REDIS_PORT= #e.g. 6379 or 127.0.0.1:6379 for localhost
 REDIS_USERNAME= 
 REDIS_PASSWORD=
 
+
+### PROD ONLY CONFIG
 # Server SSL certificates
 SSL_CERTIFICATE_FILE= # provide key to certificate
 SSL_PRIVATE_KEY_FILE= # provide path to private key
+DOMAIN_NAME= # domain e.g. mysite.org.uk or localhost for local dev

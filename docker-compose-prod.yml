@@ -124,15 +124,25 @@ services:
       container_name: geoserver2-24_arches
       image: kartoza/geoserver:2.24.1
       volumes:
+        - $SSL_CERTIFICATE_FILE:/etc/ssl/certificate-file.crt
+        - $SSL_PRIVATE_KEY_FILE:/etc/ssl/private-key.key
         - geoserver-data-arches:/opt/geoserver/data_dir
       ports:
         - 127.0.0.1:8080:8080
+        - 127.0.0.1:8443:8443
       environment:
         - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
         - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
         - CORS_ENABLED=true
         - COMMUNITY_EXTENSIONS=cog-plugin,s3-geotiff-plugin
         - SKIP_DEMO_DATA=true
+        - SSL=true
+        - SSL_CERT_FILE=/etc/ssl/certificate-file.crt
+        - SSL_KEY_FILE=/etc/ssl/private-key.key
+        # - SSL_CA_FILE=/etc/certs/root.crt
+        - HTTPS_PROXY_NAME=$DOMAIN_NAME
+        - HTTPS_PROXY_PORT=127.0.0.1:8443
+        - HTTPS_SCHEME=https
       env_file:
         - ./.env
       networks:
