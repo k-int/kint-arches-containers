@@ -19,12 +19,51 @@ Future containers to be added:
 Previously removed:
 - CouchDB (removed in 7.0.0)
 
-## Configuration
+## Instructions
 
 ### Getting started
 Copy the env_template file and rename it to .env.  This will be the secret env file that should never be committed (it is in the .gitignore by default).
 
 Each of the ports should be set to localhost, unless there is a requirement for external access.  If this is the case, ensure the ports are not open to public in the firewall or via AWS security groups.
+
+Two compose files exist in this repo - one for development (docker-compose-dev.yml) which runs on http, and one for production (docker-compose-prod.yml) which uses your SSL certificates for a secure https connection.
+
+To begin, run `docker compose -f [docker-compose-dev.yml / docker-compose-prod.ym] up -d`.
+The -f flag specifies the compose file.
+The -d flag spins up all containers in detatched mode (in the background). 
+
+### Using variables in Arches
+To use these variables in the Arches settings, one option is to copy and paste them, but this is problematic for a number of reasons.  It means both files will include the same passwords, in plain text, and the Arches settings.py will need updating if any change.
+
+Using the `python-dotenv` pip package, we can point to a .env file and pull the variables directly.
+
+Install the package using `pip install python-dotenv`.
+
+If a settings_local.py file doesn't already exist in your Arches project, create one.  This can be used as a secondary settings file for secret configurations/password, as it is always in the .gitignore.  
+
+Ensure your settings_local.py has the following at the top of the file.
+```
+try:
+    from .{ARCHES_PROJECT_NAME}.settings import *
+except ImportError:
+    pass
+``` 
+
+Then, add the following lines to the settings_local.py file, and supply the path to this .env file.
+```
+from dotenv import load_dotenv
+from pathlib import Path
+
+dotenv_path = Path('path/to/.env')
+load_dotenv(dotenv_path=dotenv_path)
+```
+
+Now the .env file has been loaded into the django settings, it can be used in configuration e.g.
+```
+ELASTICSEARCH_HTTP_PORT=os.getenv('ELASTIC_PORT')
+```
+
+## Dependency configuration
 
 ### PostgreSQL
 Postgres has the option to be tuned to the specs of the server.  If this is not required, leave the default .env values.
