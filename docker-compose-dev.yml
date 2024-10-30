@@ -58,8 +58,6 @@ services:
           hard: -1
       networks:
         - arches-network
-      # depends_on:
-      #   - ssl_container
       restart: always
 
 
