@@ -121,12 +121,12 @@ services:
 
 
     arches_geoserver:
-      container_name: geoserver2-24_arches
-      image: kartoza/geoserver:2.24.1
+      container_name: geoserver_arches
+      image: docker.osgeo.org/geoserver:2.27.0
       volumes:
         - $SSL_CERTIFICATE_FILE:/etc/ssl/certificate-file.crt
         - $SSL_PRIVATE_KEY_FILE:/etc/ssl/private-key.key
-        - geoserver-data-arches:/opt/geoserver/data_dir
+        - geoserver-data-arches:/opt/geoserver_data
       ports:
         - 127.0.0.1:8080:8080
         - 127.0.0.1:8443:8443
