@@ -83,6 +83,8 @@ services:
         - CORS_ENABLED=true
         - COMMUNITY_EXTENSIONS=cog-plugin,s3-geotiff-plugin
         - SKIP_DEMO_DATA=true
+        - PROXY_BASE_URL=https://${DOMAIN_NAME}/geoserver
+        - WEBAPP_CONTEXT=/geoserver
       env_file:
         - ./.env
       networks:
