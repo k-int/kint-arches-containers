@@ -29,56 +29,22 @@ services:
         - ./.env
       restart: always
 
-
-    arches_elasticsearch_01:
-      container_name: elasticsearch_arches_01
+    arches_elasticsearch:
+      container_name: arches_elasticsearch
       image: elasticsearch:8.5.3
       volumes:
-        - elasticsearch-data-arches-01:/usr/share/elasticsearch/data
+        - elasticsearch-data-arches:/usr/share/elasticsearch/data
       ports:
         - "${ELASTIC_PORT}:9200"
         - "127.0.0.1:9301:9300"
       environment:
         - TZ=UTC
-        - node.name=arches_elasticsearch_01
-        - cluster.name=kint_arches_contaniners_elasticsearch
-        - cluster.initial_master_nodes=arches_elasticsearch_01,arches_elasticsearch_02
-        - discovery.seed_hosts=arches_elasticsearch_02
+        - discovery.type=single-node
         #- "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
         - bootstrap.memory_lock=true
         - ELASTIC_USER=$ELASTIC_USER
         - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
-        - xpack.security.enabled=false
-        - xpack.security.transport.ssl.enabled=false
-        - xpack.security.http.ssl.enabled=false
-      mem_limit: $ELASTIC_MEM_LIMIT
-      ulimits:
-        memlock:
-          soft: -1
-          hard: -1
-      networks:
-        - arches-network
-      restart: always
-
-
-    arches_elasticsearch_02:
-      container_name: elasticsearch_arches_02
-      image: elasticsearch:8.5.3
-      volumes:
-        - elasticsearch-data-arches-02:/usr/share/elasticsearch/data
-      environment:
-        - TZ=UTC
-        - node.name=arches_elasticsearch_02
-        - cluster.name=kint_arches_contaniners_elasticsearch
-        - cluster.initial_master_nodes=arches_elasticsearch_01,arches_elasticsearch_02
-        - discovery.seed_hosts=arches_elasticsearch_01
-        #- "ES_JAVA_OPTS=-Xms${ELASTIC_JVM_OPTS} -Xmx${ELASTIC_JVM_OPTS}"
-        - bootstrap.memory_lock=true
-        - ELASTIC_USER=$ELASTIC_USER
-        - ELASTIC_PASSWORD=$ELASTIC_PASSWORD
-        - xpack.security.enabled=false
-        - xpack.security.transport.ssl.enabled=false
-        - xpack.security.http.ssl.enabled=false
+        - xpack.security.enabled=$ELASTIC_SECURITY
       mem_limit: $ELASTIC_MEM_LIMIT
       ulimits:
         memlock:
@@ -203,8 +169,7 @@ networks:
 volumes:
     postgres-data-arches:
     postgres-log-arches:
-    elasticsearch-data-arches-01:
-    elasticsearch-data-arches-02:
+    elasticsearch-data-arches:
     rabbitmq-logs-arches:
     rabbitmq-data-arches:
     geoserver-data-arches:
