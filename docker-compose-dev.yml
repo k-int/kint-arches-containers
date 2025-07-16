@@ -85,6 +85,7 @@ services:
         - SKIP_DEMO_DATA=true
         - PROXY_BASE_URL=https://${DOMAIN_NAME}/geoserver
         - WEBAPP_CONTEXT=/geoserver
+        - GEOSERVER_CSRF_WHITELIST=${DOMAIN_NAME}
       env_file:
         - ./.env
       networks:
