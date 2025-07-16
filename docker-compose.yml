@@ -72,7 +72,7 @@ services:
 
     arches_geoserver:
       container_name: geoserver_arches
-      image: docker.osgeo.org/geoserver:2.27.0
+      image: docker.osgeo.org/geoserver:2.27.x
       volumes:
         - geoserver-data-arches:/opt/geoserver_data
       ports:
@@ -81,7 +81,8 @@ services:
         - GEOSERVER_ADMIN_USER=${GEOSERVER_ADMIN_USER}
         - GEOSERVER_ADMIN_PASSWORD=${GEOSERVER_ADMIN_PASSWORD}
         - CORS_ENABLED=true
-        - COMMUNITY_EXTENSIONS=cog-plugin,s3-geotiff-plugin
+        - INSTALL_EXTENSIONS=true
+        - COMMUNITY_EXTENSIONS=cog-s3,s3-geotiff
         - SKIP_DEMO_DATA=true
         - PROXY_BASE_URL=https://${DOMAIN_NAME}/geoserver
         - WEBAPP_CONTEXT=/geoserver
