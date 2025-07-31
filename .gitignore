@@ -1,1 +1,8 @@
 .env
+
+/geoserver/s3.properties
+/geoserver/map_layers/*
+!/geoserver/map_layers/readme.md
+
+#testing
+/geoserver/ehcache-2.10.9.2.jar
